@@ -110,12 +110,12 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Ваш никнейм</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Ваш нікнейм</label>
               <input
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                placeholder="Например: Геральт"
+                placeholder="Наприклад: Геральт"
                 maxLength={15}
                 className="w-full px-4 py-3 bg-gray-900 rounded-xl text-white border border-gray-600 focus:outline-none focus:border-indigo-500 transition-colors font-medium"
               />
@@ -127,10 +127,11 @@ export default function Home() {
                 type="text"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
-                placeholder="Наприкоад: room_554"
+                placeholder="Наприклад: room_554"
                 className="w-full px-4 py-3 bg-gray-900 rounded-xl text-white border border-gray-600 focus:outline-none focus:border-indigo-500 transition-colors font-mono"
               />
             </div>
+
 
             <button
               onClick={joinRoom}
