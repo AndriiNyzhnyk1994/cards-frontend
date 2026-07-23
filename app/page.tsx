@@ -165,7 +165,7 @@ export default function Home() {
                 <li key={p.id} className={`bg-gray-900/50 p-3 rounded-xl border transition-all ${p.id === czarId && gameStatus !== 'game_over' ? 'border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.15)] bg-yellow-900/10' : 'border-gray-700'} ${p.id === winnerId ? 'border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.3)] bg-purple-900/20' : ''}`}>
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-semibold text-gray-200 truncate pr-2">
-                      {p.name} {p.id === socket.id ? <span className="text-indigo-400 text-xs ml-1">(Вы)</span> : ''}
+                      {p.name} {p.id === socket.id ? <span className="text-indigo-400 text-xs ml-1">(Ви)</span> : ''}
                     </span>
                     <span className="text-yellow-500 font-bold text-sm shrink-0 bg-gray-800 px-2 py-0.5 rounded-md border border-gray-700">{p.score} 🏆</span>
                   </div>
@@ -258,7 +258,7 @@ export default function Home() {
                     <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30">
                       <span className="text-2xl">✅</span>
                     </div>
-                    <p className="text-green-400 font-bold text-xl mb-2">Ответ принят!</p>
+                    <p className="text-green-400 font-bold text-xl mb-2">Відповідь прийнята!</p>
                     <p className="text-gray-400 text-sm">Карта лягла на стіл рубашкою догори. Очікуємо інших гравців...</p>
                   </div>
                 ) : (
@@ -295,8 +295,8 @@ export default function Home() {
                 <h2 className="text-3xl font-bold text-white mb-2 text-center">Вибір переможця</h2>
                 <p className="text-gray-400 text-sm mb-10 text-center max-w-md">
                   {socket.id === czarId 
-                    ? "Вы — Царь! Прочитайте ответы и кликните на тот, который разрывнее всего дополняет черную карту." 
-                    : "Царь читает ответы... Держим кулачки за вашу карту!"}
+                    ? "Ви — Царь! Прочитайте відповіді та клікніть на ту, котора розривніше усього доповнює чорну карту." 
+                    : "Царь читає відповіді..."}
                 </p>
 
                 <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start w-full">
