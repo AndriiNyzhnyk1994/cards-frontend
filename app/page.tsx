@@ -36,6 +36,13 @@ export default function Home() {
   const [playedCards, setPlayedCards] = useState<PlayedCard[]>([]);
   const [winnerId, setWinnerId] = useState<string | null>(null);
 
+// === НОВОЕ СОСТОЯНИЕ ДЛЯ ЭКРАНА РЕЗУЛЬТАТОВ ===
+  const [roundResults, setRoundResults] = useState<{
+    winnerName: string;
+    winningCard: string;
+    blackCard: string;
+  } | null>(null);
+
   useEffect(() => {
     socket.on('room_status_update', (data) => {
       setPlayers(data.players);
@@ -49,6 +56,18 @@ export default function Home() {
       setWinnerId(data.winnerId || null); 
       setInRoom(true); 
       setErrorMsg('');
+
+      // Очищаем результаты, когда начинается новый раунд
+      if (data.status !== 'showing_results') {
+        setRoundResults(null);
+      }
+    });
+
+    // === НОВОЕ СОБЫТИЕ: ЛОВИМ РЕЗУЛЬТАТЫ РАУНДА ===
+    socket.on('round_results', (data) => {
+      setRoundResults(data);
+      setGameStatus('showing_results'); // Принудительно включаем экран результатов
+      if (data.players) setPlayers(data.players); // Сразу обновляем счет игроков слева
     });
 
     socket.on('error_message', (msg) => {
@@ -57,6 +76,7 @@ export default function Home() {
 
     return () => {
       socket.off('room_status_update');
+      socket.off('round_results'); // Не забываем отписаться
       socket.off('error_message');
     };
   }, []);
@@ -172,8 +192,8 @@ export default function Home() {
                   
                   <div className="flex flex-wrap items-center gap-1.5 mt-1">
                     {p.isHost && <span className="text-[10px] bg-indigo-900/80 text-indigo-200 border border-indigo-700 px-2 py-0.5 rounded-full font-medium">Хост</span>}
-                    {p.id === czarId && gameStatus !== 'game_over' && <span className="text-[10px] bg-yellow-900/80 text-yellow-200 border border-yellow-700 px-2 py-0.5 rounded-full font-bold">👑 Царь</span>}
-                    {p.id === winnerId && <span className="text-[10px] bg-purple-900/80 text-purple-200 border border-purple-700 px-2 py-0.5 rounded-full font-bold">🌟 ПОБЕДИТЕЛЬ</span>}
+                    {p.id === czarId && gameStatus !== 'game_over' && <span className="text-[10px] bg-yellow-900/80 text-yellow-200 border border-yellow-700 px-2 py-0.5 rounded-full font-bold">👑 Цар</span>}
+                    {p.id === winnerId && <span className="text-[10px] bg-purple-900/80 text-purple-200 border border-purple-700 px-2 py-0.5 rounded-full font-bold">🌟 ПЕРЕМОЖЕЦЬ</span>}
                     
                     {gameStatus === 'playing' && !p.isHost && p.id !== czarId && (
                       <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${p.hasPlayed ? 'bg-green-900/50 text-green-300 border-green-800' : 'bg-gray-800 text-gray-400 border-gray-700'}`}>
@@ -239,7 +259,7 @@ export default function Home() {
                 {socket.id === czarId ? (
                   <div className="w-full max-w-lg bg-yellow-900/10 p-6 rounded-2xl border border-yellow-700/30 text-center">
                     <p className="text-yellow-500 font-bold text-2xl mb-2 flex items-center justify-center gap-2">
-                      <span>👑</span> Ви Царь Карт!
+                      <span>👑</span> Ви Цар Карт!
                     </p>
                     <p className="text-gray-400 text-sm mb-6">Ваша задача — дочекатися відповідей та вибрати найсмішнішу.</p>
                     
@@ -295,8 +315,8 @@ export default function Home() {
                 <h2 className="text-3xl font-bold text-white mb-2 text-center">Вибір переможця</h2>
                 <p className="text-gray-400 text-sm mb-10 text-center max-w-md">
                   {socket.id === czarId 
-                    ? "Ви — Царь! Прочитайте відповіді та клікніть на ту, котора розривніше усього доповнює чорну карту." 
-                    : "Царь читає відповіді..."}
+                    ? "Ви — Цар! Прочитайте відповіді та клікніть на ту, котора розривніше усього доповнює чорну карту." 
+                    : "Цар читає відповіді..."}
                 </p>
 
                 <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start w-full">
@@ -337,7 +357,37 @@ export default function Home() {
                 </div>
               </div>
             )}
+{/* НОВОЕ СОСТОЯНИЕ: ПОКАЗ РЕЗУЛЬТАТОВ РАУНДА */}
+            {gameStatus === 'showing_results' && roundResults && (
+              <div className="flex-1 flex flex-col items-center justify-center text-center animate-fade-in w-full">
+                <div className="mb-8">
+                  <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600 mb-3 drop-shadow-lg animate-bounce">
+                    Раунд виграв(ла) {roundResults.winnerName}! 🎉
+                  </h2>
+                  <p className="text-green-400 font-bold tracking-widest uppercase text-sm">+1 бал у скарбничку</p>
+                </div>
 
+                <div className="flex flex-col md:flex-row gap-6 md:gap-10 mb-12 items-center justify-center w-full">
+                  {/* Черная карта */}
+                  <div className="shrink-0 bg-black text-white p-6 rounded-2xl w-full max-w-[280px] aspect-[4/5] flex flex-col justify-between shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-gray-700 transform -rotate-2">
+                    <p className="text-xl font-bold leading-snug text-left break-words">{roundResults.blackCard}</p>
+                    <div className="text-[10px] text-gray-500 font-bold tracking-widest text-left uppercase">Cards Against Humanity</div>
+                  </div>
+                  
+                  {/* Победившая белая карта */}
+                  <div className="shrink-0 bg-white text-black p-6 rounded-2xl w-full max-w-[280px] aspect-[4/5] flex flex-col justify-between shadow-[0_0_50px_rgba(52,211,153,0.3)] border-4 border-green-500 transform rotate-2 scale-105 z-10">
+                    <p className="text-xl font-bold leading-snug text-left break-words">{roundResults.winningCard}</p>
+                    <div className="text-[10px] text-gray-500 font-bold tracking-widest text-left uppercase">Cards Against Humanity</div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-900/80 px-8 py-4 rounded-full border border-gray-700 animate-pulse shadow-lg">
+                  <p className="text-gray-300 font-medium flex items-center gap-3">
+                    <span className="text-xl">⏳</span> Наступний раунд почнеться через 3 секунди...
+                  </p>
+                </div>
+              </div>
+            )}
             {/* НОВОЕ СОСТОЯНИЕ: ИГРА ОКОНЧЕНА */}
             {gameStatus === 'game_over' && (
               <div className="flex-1 flex flex-col items-center justify-center text-center animate-fade-in">
