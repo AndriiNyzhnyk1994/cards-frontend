@@ -10,3 +10,13 @@ export const socket = io(BACKEND_URL, {
   },
   transports: ['websocket', 'polling'],
 });
+
+// для тестов
+// import { io } from 'socket.io-client';
+
+// // Меняем ngrok-ссылку на локальный адрес бэкенда
+// const BACKEND_URL = 'http://localhost:3001'; 
+
+// export const socket = io(BACKEND_URL, {
+//   transports: ['websocket', 'polling'],
+// });
